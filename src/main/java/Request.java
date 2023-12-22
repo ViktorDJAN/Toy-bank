@@ -1,7 +1,6 @@
 public class Request  {
     private String clientName;
-
-    int amount;
+    private int amount;
     private OperationType operationType;
 
 

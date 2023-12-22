@@ -5,7 +5,7 @@ public class RequestHandler implements Runnable {
 
     @Override
     public void run() {
-        while (frontalSystem.getRequestsQueue().size() > 0) {
+        while (true) {
             Request request = frontalSystem.getRequest();
             System.out.println(handlerName + ": получена заявка на обработку по клиенту - " + request.getClientName());
             if (request.getOperationType().equals(OperationType.INCREASE)) {

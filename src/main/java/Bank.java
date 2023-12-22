@@ -1,8 +1,10 @@
-public class Bank {
+import java.util.concurrent.*;
+
+public class Bank  {
 
     private int totalAmount;
 
-    public Bank(int totalAmount) {
+    public Bank(int totalAmount) throws Exception{
         this.totalAmount = totalAmount;
     }
 
@@ -10,8 +12,12 @@ public class Bank {
         return totalAmount;
     }
 
+    public void setTotalAmount(int totalAmount) {
+        this.totalAmount = totalAmount;
+    }
 
     public synchronized void increaseTotalAmount(int value, Request request) {
+
         totalAmount += value;
         printInfoPositive(request);
     }

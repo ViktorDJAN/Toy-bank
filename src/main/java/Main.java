@@ -1,5 +1,9 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         FrontalSystem frontalSystem = new FrontalSystem();
 
         Request request1 = new Request("Клиент_1", 10, OperationType.INCREASE);
@@ -10,31 +14,31 @@ public class Main {
         Client client1 = new Client(request1, frontalSystem);
         Client client2 = new Client(request2, frontalSystem);
         Client client3 = new Client(request3, frontalSystem);
+
         Client client4 = new Client(request4, frontalSystem);
-
-
-        Thread thread1 = new Thread(client1);
-        Thread thread2 = new Thread(client2);
-        Thread thread3 = new Thread(client3);
-        Thread thread4 = new Thread(client4);
-
-
         Bank bank = new Bank(5);
+
+        ExecutorService es = Executors.newFixedThreadPool(1);
+        Warm_up warmUp = new Warm_up(1200,1000,bank);
+        Future<Integer> sub = es.submit(warmUp);
+        Integer some = sub.get();
+        es.shutdown();
+
+
+        ExecutorService poolClientsThread = Executors.newFixedThreadPool(3);
+        poolClientsThread.execute(client1);
+        poolClientsThread.execute(client2);
+        poolClientsThread.execute(client3);
+        poolClientsThread.execute(client4);
+
+
 
         RequestHandler requestHandler1 = new RequestHandler("Обработчик заявок №1", bank, frontalSystem);
         RequestHandler requestHandler2 = new RequestHandler("Обработчик заявок №2", bank, frontalSystem);
 
-        Thread handler1 = new Thread(requestHandler1);
-        Thread handler2 = new Thread(requestHandler2);
-
-        thread1.start();
-        thread2.start();
-        thread3.start();
-        thread4.start();
-
-        handler1.start();
-        handler2.start();
-
+        ExecutorService poolHandlersThread = Executors.newFixedThreadPool(1);
+        poolHandlersThread.execute(requestHandler1);
+        poolHandlersThread.execute(requestHandler2);
 
     }
 }

@@ -1,40 +1,46 @@
-import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class FrontalSystem {
-
-    private Queue<Request> requestsQueue = new LinkedList<>();
-
-    public Queue<Request> getRequestsQueue() {
-        return requestsQueue;
-    }
+    private final Lock lock = new ReentrantLock();
+    /**
+     * Выбрал  LinkedBlockingDeque так как :
+     * класс имеет хорошую производительность при вставке и уадалении элементов
+     * высокая степень параллелизма что дает нескольким потокам обращаться одновременно без блокировок
+     */
+    private BlockingQueue<Request> requestsQueue = new LinkedBlockingDeque<>();
 
     public void addRequest(Request request) {
-        synchronized (requestsQueue) {
+
+        lock.lock();
+        {
             while (requestsQueue.size() > 2) {
                 try {
-                    requestsQueue.wait();
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
             requestsQueue.add(request);
-            requestsQueue.notifyAll();
+            lock.unlock();
         }
     }
 
 
     public Request getRequest() {
-        synchronized (requestsQueue) {
-            while (requestsQueue.size() <1) {
+        lock.lock();
+        {
+            while (requestsQueue.size() < 1) {
                 try {
-                    requestsQueue.wait();
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
-                 Request request1 = requestsQueue.poll();
-       //         System.out.println("заявка от " + request1.getClientName() + " была отправлен обработчику");
-                requestsQueue.notifyAll();
+            Request request1 = requestsQueue.poll();
+            lock.unlock();
 
             return request1;
         }

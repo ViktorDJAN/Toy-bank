@@ -13,6 +13,7 @@ public class Client implements Runnable {
 
     @Override
     public void run() {
+
         frontalSystem.addRequest(request);
         System.out.println("Заявка " + request.toString() + " отправлена в банк");
     }
